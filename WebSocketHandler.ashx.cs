@@ -41,7 +41,7 @@ namespace SimpleWebSocketApplication
                 onlineUsers = value;
             }
         }
-
+        
         //Asynchronous request handler.
         public async Task WebSocketRequestHandler(AspNetWebSocketContext webSocketContext)
         {
@@ -99,7 +99,7 @@ namespace SimpleWebSocketApplication
                         }
                         else
                         {
-                            await SendMsg("Wrong JSON Format...", webSocketContext);
+                            await SendMsg("Wrong JSON ...", webSocketContext);
                         }
                     }
                     catch (Exception ex)
@@ -139,6 +139,7 @@ namespace SimpleWebSocketApplication
             {
                 foreach (var user in OnlineUsers.Keys)
                 {
+                    if (user.Context.IsClientConnected)
                     await user.Context.WebSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
                 }
             }
@@ -146,7 +147,8 @@ namespace SimpleWebSocketApplication
             {
                 foreach (var user in OnlineUsers.Keys.Where(users.Contains))
                 {
-                    await user.Context.WebSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
+                    if (user.Context.IsClientConnected)
+                        await user.Context.WebSocket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
                 }
             }
         }
